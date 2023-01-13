@@ -52,6 +52,7 @@ public class TransactionService {
         // If it fails: throw new Exception("Book is either unavailable or not present");
         if(book == null || !book.isAvailable()){
             transaction.setTransactionStatus(TransactionStatus.FAILED);
+            bookRepository5.updateBook(book);
             transactionRepository5.save(transaction);
             throw new Exception("Book is either unavailable or not present");
         }
@@ -59,6 +60,7 @@ public class TransactionService {
         // If it fails: throw new Exception("Card is invalid");
         else if(card == null || card.getCardStatus().equals(CardStatus.DEACTIVATED)){
             transaction.setTransactionStatus(TransactionStatus.FAILED);
+            bookRepository5.updateBook(book);
             transactionRepository5.save(transaction);
             throw new Exception("Card is invalid");
         }
@@ -66,42 +68,28 @@ public class TransactionService {
         // If it fails: throw new Exception("Book limit has reached for this card");
        else if(card.getBooks().size() >= max_allowed_books) {
             transaction.setTransactionStatus(TransactionStatus.FAILED);
+            bookRepository5.updateBook(book);
             transactionRepository5.save(transaction);
             throw new Exception("Book limit has reached for this card");
         }
         //If the transaction is successful, save the transaction to the list of transactions and return the id
-        book.setCard(card);
-        book.setAvailable(false);
-//        List<Book> bookList = card.getBooks();
-//        bookList.add(book);
-//        card.setBooks(bookList);
-        if (card.getBooks() == null) {
-            List<Book> books = new ArrayList<Book>();
-            books.add(book);
-            card.setBooks(books);
-        } else {
-            card.getBooks().add(book);
+        else {
+            book.setCard(card);
+            book.setAvailable(false);
+            List<Book> bookList = card.getBooks();
+            bookList.add(book);
+            card.setBooks(bookList);
+
+            bookRepository5.updateBook(book);
+
+            transaction.setTransactionStatus(TransactionStatus.SUCCESSFUL);
+
+            transactionRepository5.save(transaction);
+
+            return transaction.getTransactionId();
+
+            //Note that the error message should match exactly in all cases
         }
-
-        bookRepository5.updateBook(book);
-
-        if (book.getTransactions() == null) {
-            ArrayList<Transaction> t = new ArrayList<Transaction>();
-            t.add(transaction);
-            book.setTransactions(t);
-        } else
-        {
-            book.getTransactions().add(transaction);
-        }
-
-        transaction.setTransactionStatus(TransactionStatus.SUCCESSFUL);
-
-        transactionRepository5.save(transaction);
-
-        return transaction.getTransactionId();
-
-        //Note that the error message should match exactly in all cases
-
     }
 
     public Transaction returnBook(int cardId, int bookId) throws Exception{
@@ -125,32 +113,21 @@ public class TransactionService {
             fine = (int)((no_of_days_passed - getMax_allowed_days) * fine_per_day);
         }
 
+
+        //update the book and its status
+        Book book = transaction.getBook();
+        book.setAvailable(true);
+        book.setCard(null);
+        bookRepository5.updateBook(book);
+
         //Remove that book from that card list
 
         Transaction tr = new Transaction();
-        tr.setTransactionId(UUID.randomUUID().toString());
         tr.setBook(transaction.getBook());
         tr.setCard(transaction.getCard());
         tr.setIssueOperation(false);
         tr.setFineAmount(fine);
         tr.setTransactionStatus(TransactionStatus.SUCCESSFUL);
-
-
-        //update the book and its status
-
-        Book book = transaction.getBook();
-        book.setCard(null);
-        book.getTransactions().add(transaction);
-        book.setAvailable(true);
-        bookRepository5.updateBook(book);
-
-
-        tr.setBook(book);
-        tr.setCard(transaction.getCard());
-
-        transactionRepository5.save(tr);
-
-
 
         transactionRepository5.save(tr);
 
