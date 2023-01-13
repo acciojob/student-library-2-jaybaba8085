@@ -26,7 +26,7 @@ public class Author {
     public Author() {
     }
 
-    public Author(int id, String name, String email, int age, String country, List<Book> booksWritten) {
+    public Author(int id, String name, String email, int age, String country) {
         this.name = name;
         this.email = email;
         this.age = age;
