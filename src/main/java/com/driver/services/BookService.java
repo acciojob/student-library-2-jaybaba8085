@@ -27,7 +27,6 @@ public class BookService {
         Author author =  authorRepository1.findById(authorId).get();
 
         author.getBooksWritten().add(book);
-
         book.setAuthor(author);
 
         bookRepository2.save(book);  //bidirectional
@@ -39,22 +38,18 @@ public class BookService {
     public List<Book> getBooks(String genre, boolean available, String author){
 
 
-        if(genre != null && author != null && available)
-        {
-            return bookRepository2.findBooksByGenreAuthor(genre, author, available);
+        List<Book> books = null; //find the elements of the list by yourself
+
+        if(genre != null && author != null){
+            books = bookRepository2.findBooksByGenreAuthor(genre, author, available);
+        } else if (genre != null) {
+            books = bookRepository2.findBooksByGenre(genre, available);
+        } else if (author != null) {
+            books = bookRepository2.findBooksByAuthor(author, available);
+        }else {
+            books = bookRepository2.findByAvailability(available);
         }
-        else if(author != null)
-        {
-            return bookRepository2.findBooksByAuthor(author, available);
-        }
-        else if(genre != null)
-        {
-            return bookRepository2.findBooksByGenre(genre, available);
-        }
-        else if(!available)
-        {
-            return bookRepository2.findByAvailability(available);
-        }
-        else return  null;
+
+        return books;
     }
 }
