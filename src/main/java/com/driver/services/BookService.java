@@ -16,23 +16,9 @@ public class BookService {
     @Autowired
     BookRepository bookRepository2;
 
-    @Autowired
-    AuthorRepository authorRepository1;
-
     public void createBook(Book book)
     {
-
-        int authorId = book.getAuthor().getId();
-
-        Author author =  authorRepository1.findById(authorId).get();
-
-        author.getBooksWritten().add(book);
-        book.setAuthor(author);
-
-        bookRepository2.save(book);  //bidirectional
-
-        authorRepository1.save(author);
-
+      bookRepository2.save(book);
     }
 
     public List<Book> getBooks(String genre, boolean available, String author){
