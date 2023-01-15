@@ -15,18 +15,10 @@ public class BookService {
 
     @Autowired
     BookRepository bookRepository2;
-    @Autowired
-    AuthorRepository authorRepository1;
 
     public void createBook(Book book)
     {
         bookRepository2.save(book);
-        int authorId = book.getAuthor().getId();
-        Author author =  authorRepository1.findById(authorId).get();
-        author.getBooksWritten().add(book);
-        book.setAuthor(author);
-        authorRepository1.save(author);
-
     }
 
     public List<Book> getBooks(String genre, boolean available, String author){
@@ -35,15 +27,19 @@ public class BookService {
         List<Book> books = null; //find the elements of the list by yourself
 
         if(genre != null && author != null){
-            books = bookRepository2.findBooksByGenreAuthor(genre, author, available);
+           // books =
+            return bookRepository2.findBooksByGenreAuthor(genre, author, available);
         } else if (genre != null) {
-            books = bookRepository2.findBooksByGenre(genre, available);
+           // books =
+            return bookRepository2.findBooksByGenre(genre, available);
         } else if (author != null) {
-            books = bookRepository2.findBooksByAuthor(author, available);
+            //books =
+            return bookRepository2.findBooksByAuthor(author, available);
         }else {
-            books = bookRepository2.findByAvailability(available);
+            //books =
+            return bookRepository2.findByAvailability(available);
         }
 
-        return books;
+     //   return books;
     }
 }
