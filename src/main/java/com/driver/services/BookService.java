@@ -15,10 +15,18 @@ public class BookService {
 
     @Autowired
     BookRepository bookRepository2;
+    @Autowired
+    AuthorRepository authorRepository1;
 
     public void createBook(Book book)
     {
-      bookRepository2.save(book);
+        bookRepository2.save(book);
+        int authorId = book.getAuthor().getId();
+        Author author =  authorRepository1.findById(authorId).get();
+        author.getBooksWritten().add(book);
+        book.setAuthor(author);
+        authorRepository1.save(author);
+
     }
 
     public List<Book> getBooks(String genre, boolean available, String author){
